@@ -10,14 +10,13 @@ public class Entrada {
 
     /**
      * Pide un número entero dentro de un rango y repite la pregunta hasta que
-     * el usuarui escriba un valor válido
+     * el usuario escriba un valor válido.
      *
      * @param mensaje texto que se muestra al usuario
-     * @param min valor mínimo permitido
-     * @param max valor máximo permitido
-     * @return un entero entre max y min
+     * @param min     valor mínimo permitido
+     * @param max     valor máximo permitido
+     * @return un entero entre min y max
      */
-
     public static int leerEntero(String mensaje, int min, int max) {
         while (true) {
             System.out.print(mensaje);
@@ -25,10 +24,10 @@ public class Entrada {
             try {
                 int valor = Integer.parseInt(linea);
                 if (valor >= min && valor <= max) {
-                return valor;
+                    return valor;
                 }
-                System.out.println("Escriba un número entero " + min + " y " + max);
-            }catch (NumberFormatException e ) {
+                System.out.println("Escribe un número entre " + min + " y " + max);
+            } catch (NumberFormatException e) {
                 System.out.println("Eso no es un número válido");
             }
         }
@@ -38,7 +37,7 @@ public class Entrada {
      * Pide un texto, por ejemplo el nombre del jugador.
      *
      * @param mensaje texto que se le muestra al usuario
-     * @return el texto escrito, o "Anonimo" si no escribió nada
+     * @return el texto escrito, o "Anónimo" si no escribió nada
      */
     public static String leerTexto(String mensaje) {
         System.out.print(mensaje);
