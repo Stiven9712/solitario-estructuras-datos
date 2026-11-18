@@ -6,7 +6,7 @@ public class Movimiento {
 
     /** Tipos de jugada que se pueden hacer*/
     public enum Tipo {
-        ROBAR, COLUMNA_A_COLUMNA, COLUMNA_A_FUNDACION, DESCARTE_A_COLUMNA
+        ROBAR, COLUMNA_A_COLUMNA, COLUMNA_A_FUNDACION, DESCARTE_A_COLUMNA, DESCARTE_A_FUNDACION
     }
 
     private Tipo tipo;

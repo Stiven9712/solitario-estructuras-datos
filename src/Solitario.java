@@ -1,3 +1,13 @@
+/**
+ * Estado y reglas del Solitario (Klondike). Aquí se juntan las cinco
+ * estructuras de datos propias:
+ * - Lista doble: las 7 columnas del tablero.
+ * - Pila: las 4 fundaciones, el historial de jugadas (deshacer) y la pila
+ *   temporal que conserva el orden al mover grupos de cartas.
+ * - Cola: el mazo de robo.
+ * - Lista circular: el descarte, que se recicla al mazo cuando este se acaba.
+ * (El ranking de puntajes, que usa el árbol, vive en Main.)
+ */
 public class Solitario {
     private ListaDoble<Carta>[] columnas;
     private Pila<Carta>[] fundaciones;
@@ -6,6 +16,11 @@ public class Solitario {
     private int puntaje;
     private Pila<Movimiento> historial;
 
+    /**
+     * Crea un juego vacío, con las 7 columnas, las 4 funciones, el mazo, el
+     * descarte y el historial sin cartas. Para empezar a jugar hay que llamar
+     * a repartir()
+     */
     @SuppressWarnings("unchecked")
     public Solitario() {
         columnas = new ListaDoble[7];
@@ -22,6 +37,11 @@ public class Solitario {
         historial = new Pila<>();
     }
 
+    /**
+     * Baraja las 52 cartas y las reparte: la comuna 1 recibe 1 carta, la 2
+     * recibe 2, y así hasta la 7 (28). Solo la última de cada columna
+     * queda boca arriba. Las 24 restantes se encolan en el mazo
+     */
     public void repartir() {
         Carta[] cartas = Baraja.crearBarajada();
         int indice = 0;
@@ -41,6 +61,11 @@ public class Solitario {
         }
     }
 
+    /**
+     * Dibuja el tablero en consola: puntaje, fundaciones, mazo, descarte con su
+     * carta visible y las 7 columnas (las cartas tapadas salen como ##).
+     * Usa obtener () de la lista doble para leer cada carta de cada columna
+     */
     public void mostrar() {
         System.out.println("Puntaje: " + puntaje);
 
@@ -92,6 +117,13 @@ public class Solitario {
         }
     }
 
+    /**
+     * Roba la primera carta del mazo (cola), la voltea y la pone en el descarte
+     * (lista circular). Si el mazo está vacío, recicla el descarte; en ese caso
+     * el historial se vacia y no se puede deshacer más allá del reciclaje
+     *
+     * @return true si se puede robar, false si no había cartas en el mazo ni en el descarte
+     */
     public boolean robar() {
         if (mazo.estaVacia()) {
             if (!reciclar()) {
@@ -106,6 +138,13 @@ public class Solitario {
         return true;
     }
 
+    /**
+     * Pasa todas las cartas del descarte de vuelta al mazo, tapadas y en el
+     * mismo orden. Solo se hace cuando el mazo está vacío y el descarte tiene
+     * cartas. Complejidad 0(n).
+     *
+     * @return true si pudo reciclar, false si no se cumplía las condiciones
+     */
     public boolean reciclar() {
         if (!mazo.estaVacia() || descarte.estaVacia()) {
             return false;
@@ -118,6 +157,16 @@ public class Solitario {
         return true;
     }
 
+    /**
+     * Valida si un movimiento entre columnas está permitido: la carta dede
+     * estar boca arriba y llegar sobre una de color distinto y de valor de unidad mayor,
+     * o ser k si la columna destino está vacía
+     *
+     * @param origen columna de donde sale la carta (0 a 6)
+     * @param posicion posición de la carta dentro de la columna de origen
+     * @param destino columna a donde va (0 a 6)
+     * @return true si el movimiento es válido
+     */
     private boolean puedeMover(int origen, int posicion, int destino) {
         if (origen < 0 || origen > 6 || destino < 0 || destino > 6 || origen == destino) {
             return false;
@@ -133,6 +182,18 @@ public class Solitario {
         return base.esRoja() != movida.esRoja() && base.getValor() == movida.getValor() + 1;
     }
 
+    /**
+     * Mueve una carta y todas las que tiene debajo de una columna a otra. Saca
+     * las cartas del final de la lista doble hacia una pila temporal y las
+     * vuelve a insertar en el destino: Si la pila invierte el orden, así que las
+     * cartas llegan igual que estaban. Si la columna de origen queda con una
+     * carta tapada al final, la voltea. Guarda la jugada en el historial
+     *
+     * @param origen columna de donde sale las cartas (0 a6)
+     * @param posicion posición de la primera carta que se mueve
+     * @param destino columna a donde va (0 a 6)
+     * @return true si movió, false si el movimiento no era valido
+     */
     public boolean mover(int origen, int posicion, int destino) {
         if (!puedeMover(origen, posicion, destino)) {
             return false;
@@ -158,16 +219,39 @@ public class Solitario {
         return true;
     }
 
+    /**
+     * Pone una carta al final de una columna. Solo se usa oara armar tableros
+     * conocidos en las pruebas
+     *
+     * @param columna  columnas destino (0 a 6)
+     * @param carta carta que se coloca
+     * @param bocaArriba true para dejarla visible, false para taparla
+     */
     public void colocarCarta(int columna, Carta carta, boolean bocaArriba) {
         carta.setBocaArriba(bocaArriba);
         columnas[columna].insertarFinal(carta);
     }
 
+    /**
+     * Encola una carta tapada en el mazo. Solo se usa para armar mazos
+     * conocidos en las pruebas
+     *
+     * @param carta carta qye entra en el mazo
+     */
     public void colocarEnMazo(Carta carta) {
         carta.setBocaArriba(false);
         mazo.encolar(carta);
     }
 
+    /**
+     * Sube ka última carta de una columna a su fundación. La fundación de cada
+     * palo es una pila: si esta está vacía solo entra el As, y si no, entra la carta
+     * que vale una más que el tope. Suma 10 puntos, voltea la carta que puede
+     * al final de la columna y guarda la jugada en el historial
+     *
+     * @param columna columna de donde sale la carta (0 a 6)
+     * @return true si la movió, false si no era válido
+     */
     public boolean moverAFundacion(int columna) {
         if (columna < 0 || columna > 6) {
             return false;
@@ -203,6 +287,15 @@ public class Solitario {
         historial.apilar(new Movimiento(Movimiento.Tipo.COLUMNA_A_FUNDACION, columna, carta.getPalo().ordinal(), 1, volteo));
         return true;
     }
+
+    /**
+     * Mueve la carta visible del descarte al final de una columna, con la misma
+     * regla de colores alternados y valor descendente (o un k en columna vacía).
+     * Guarda la jugada en el historial
+     *
+     * @param destino columna a donde va la carta (0 a 6)
+     * @return true si la movió, false si no era válido o el descarte estaba vacío
+     */
     public boolean moverDescarteAColumna(int destino) {
         if (destino < 0|| destino > 6) {
             return false;
@@ -227,6 +320,42 @@ public class Solitario {
         return true;
     }
 
+    /**
+     * Sube la carta visible del descarte a su fundación, con la misma regla de
+     * siempre: si la pila está vacía solo entra el As, y si no, la carta que vale
+     * uno más que el tope. Suma 10 puntos y guarda la jugada en el historial
+     *
+     * @return true si la movió, false si no era válido o el descarte estaba vacío
+     */
+    public boolean moverDescarteAFundacion() {
+        Carta carta = descarte.verUltimo();
+        if (carta == null) {
+            return false;
+        }
+        Pila<Carta> pila = fundaciones[carta.getPalo().ordinal()];
+        Carta tope = pila.verTope();
+        boolean valida;
+        if (tope == null) {
+            valida = carta.getValor() == 1;
+        }else{
+            valida = carta.getValor() == tope.getValor() +1;
+        }
+        if (!valida) {
+            return false;
+        }
+        descarte.eliminarFinal();
+        pila.apilar(carta);
+        puntaje +=10;
+        historial.apilar(new Movimiento(Movimiento.Tipo.DESCARTE_A_FUNDACION, 0, carta.getPalo().ordinal(), 1, false));
+        return true;
+    }
+
+    /**
+     * Deshace la última jugada. Saca el último movimiento de la pila del
+     * historial (LIFO) y lo revierte según su tipo
+     *
+     * @return true si deshizo algo, false si el historial estaba vacío
+     */
     public boolean deshacer() {
         if (historial.estaVacia()) {
             return false;
@@ -237,19 +366,51 @@ public class Solitario {
             case DESCARTE_A_COLUMNA ->  deshacerDesacarteAColumna(m);
             case COLUMNA_A_FUNDACION -> deshacerColumnaAFunfacion(m);
             case COLUMNA_A_COLUMNA -> deshacerColumnaAColumna(m);
+            case DESCARTE_A_FUNDACION -> deshacerDescarteAFundacion(m);
         }
         return true;
     }
+
+    /**
+     * Revierte un movimiento del descarte a una columna: devuelve la carta al
+     * final del descarte
+     *
+     * @param m jugada que se deshace
+     */
     private void deshacerDesacarteAColumna(Movimiento m) {
         Carta carta = columnas[m.getDestino()].eliminarFinal();
         descarte.insertarFinal(carta);
     }
 
+    /**
+     * Revierte un movimiento del descarte a una fundación: saca la carta de la
+     * fundación, la devuelve al final del descarte y resta 10 puntos
+     *
+     * @param m jugada que se deshace
+     */
+    private void deshacerDescarteAFundacion(Movimiento m) {
+        Carta carta = fundaciones[m.getDestino()].desapilar();
+        descarte.insertarFinal(carta);
+        puntaje -=10;
+    }
+
+    /**
+     * Revierte un robo: saca la carta visible del descarte, la tapa y la
+     * devuelve al frente del mazo para que sea otra vez la próxima en robarse
+     */
     private void deshacerRobar() {
         Carta carta = descarte.eliminarFinal();
         carta.setBocaArriba(false);
         mazo.encolarFrente(carta);
     }
+
+    /**
+     * Revierte un movimiento a una fundación: saca la carta de la fundación,
+     * vuelve a tapar la carta qie se había volteado (si hubo volteo), devuleve
+     * la carta a su columna y resta los 10 puntos
+     *
+     * @param m jugada que se deshace
+     */
     private void deshacerColumnaAFunfacion(Movimiento m) {
         Carta carta = fundaciones[m.getDestino()].desapilar();
         int n = columnas[m.getOrigen()].tamano();
@@ -260,6 +421,13 @@ public class Solitario {
         puntaje -=10;
     }
 
+    /**
+     * Revierte un movimiento entre columnas: saca kas cartas del destino con una
+     * pila temporal (para conservar su orden), vuelve a tapar la carta que se
+     * había volteado en el origen (si hubo volteo) y las devuelve al origen
+     *
+     * @param m jugada que se deshace
+     */
     private void deshacerColumnaAColumna(Movimiento m) {
         Pila<Carta> temporal = new Pila<>();
         for (int i =0; i < m.getCantidad();i++) {
@@ -274,6 +442,12 @@ public class Solitario {
         }
     }
 
+    /**
+     * Indica si el jugador ganó: las 4 fundaciones tiene las 13 cartas.
+     * Complejidad 0(1), porque tamano() de la pila no recorre nada.
+     *
+     * @return true si las cuatro fundaciones están completas
+     */
     public boolean haGanado() {
         for (int i = 0; i < 4;i++) {
             if (fundaciones[i].tamano() < 13) {
@@ -283,6 +457,10 @@ public class Solitario {
         return true;
     }
 
+    /**
+     *
+     * @return puntos acumulados en la partida
+     */
     public int getPuntaje() {
         return puntaje;
     }

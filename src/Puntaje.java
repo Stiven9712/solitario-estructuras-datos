@@ -54,6 +54,6 @@ public class Puntaje implements Comparable<Puntaje>{
      */
     @Override
     public String toString() {
-        return nombre + " " + puntos;
+        return nombre + ":" + puntos;
     }
 }

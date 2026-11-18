@@ -57,9 +57,10 @@ void jugarPartida() {
         System.out.println("2. Mover entre columnas");
         System.out.println("3. Mover una carta a la fundación");
         System.out.println("4. Mover la carta del descarte a una columna");
-        System.out.println("5. Deshacer la última jugada");
-        System.out.println("6. Abandonar la partida");
-        int accion = Entrada.leerEntero("Elige una acción: ", 1, 6);
+        System.out.println("5. Mover la carta del descarte a la fundación");
+        System.out.println("6. Deshacer la última jugada");
+        System.out.println("7. Abandonar la partida");
+        int accion = Entrada.leerEntero("Elige una acción: ", 1, 7);
         boolean hecho = true;
         switch (accion) {
             case 1 -> hecho = juego.robar();
@@ -77,8 +78,9 @@ void jugarPartida() {
                 int destino = Entrada.leerEntero("Columna de destino (1-7): ", 1, 7);
                 hecho = juego.moverDescarteAColumna(destino - 1);
             }
-            case 5 -> hecho = juego.deshacer();
-            case 6 -> abandonar = true;
+            case 5 -> hecho = juego.moverDescarteAFundacion();
+            case 6 -> hecho = juego.deshacer();
+            case 7 -> abandonar = true;
         }
         if (!hecho) {
             System.out.println("No se pudo realizar esa jugada");
