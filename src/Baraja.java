@@ -1,6 +1,18 @@
+
 import java.util.Random;
+
+/**
+ * Fabrica la baraja de 52 cartas y la mezcla
+ */
 public class Baraja {
 
+    /**
+     * Crea las 52 cartas (4 palos de 13 valores) y las baraja con el método
+     * de Fisher-Yates. Complejidad 0(n). El arreglo es solo un paso
+     * intermedio: después las cartas pasan a las extructuras del juego.
+     *
+     * @return un arreglo con las 52 cartas ya mezcladas
+     */
     public static Carta[] crearBarajada() {
         Carta [] cartas = new Carta[52];
         int indice = 0;
