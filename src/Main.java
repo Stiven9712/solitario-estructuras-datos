@@ -1,5 +1,12 @@
+/*
+*Programa principal del Solitario. Muestra el menú, maneja cada
+* partida y guarda los puntajes en el árbol de mejores puntajes
+*/
+
+/** Ranking de mejores puntajes, un árbol binario de búsqueda que dura mientras el progrmaa esté abierto. */
 ArbolBST<Puntaje> ranking = new ArbolBST<>();
 
+/** Muestra el menú principal, en ciclo hasta que el jugador escoja salir. */
 void main() {
     int opcion = 0;
     while (opcion != 4) {
@@ -22,6 +29,7 @@ void main() {
     }
 }
 
+/** Imprime en pantalla las reglas del juego */
 void mostrarReglas() {
     System.out.println("--- REGLAS ---");
     System.out.println("Objetivo: llevar las 52 cartas a las 4 fundaciones, de A a K y por palo.");
@@ -32,6 +40,10 @@ void mostrarReglas() {
     System.out.println("Puedes robar del mazo, y cuando se acaba, el descarte vuelve al mazo.");
 }
 
+/**
+ * Maneja una partida completa: reparte, repite el ciclo de jugadas hasta que
+ * el jugador gane o abandone, y al final guarda el puntaje en el ranking.
+ */
 void jugarPartida() {
     Solitario juego = new Solitario();
     juego.repartir();
