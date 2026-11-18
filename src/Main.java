@@ -3,7 +3,7 @@
 * partida y guarda los puntajes en el árbol de mejores puntajes
 */
 
-/** Ranking de mejores puntajes, un árbol binario de búsqueda que dura mientras el progrmaa esté abierto. */
+/** Ranking de mejores puntajes, un árbol binario de búsqueda que dura mientras el programa esté abierto. */
 ArbolBST<Puntaje> ranking = new ArbolBST<>();
 
 /** Muestra el menú principal, en ciclo hasta que el jugador escoja salir. */
