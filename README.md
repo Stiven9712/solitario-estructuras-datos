@@ -4,15 +4,16 @@ Proyecto final de **Estructuras de Datos** – Universidad Autónoma del Cauca.
 
 Juego de Solitario Klondike para la consola, hecho en Java y construido solo con estructuras de datos programadas desde cero (sin `ArrayList`, `Stack`, `LinkedList` ni otras colecciones de Java).
 
-## Autor
+## Integrantes
 
 - Brayan Estiven Chantre Sánchez
 - Medardo Esteeven Quiñonez Dorado
-- Docente: Ana María Caviedes Castillo
 
-## Requisitos
+Docente: Ana María Caviedes Castillo
 
-- JDK 27
+## Lenguaje y requisitos
+
+- **Lenguaje:** Java (JDK 27)
 - Terminal con soporte UTF-8 (para ver ♠ ♥ ♦ ♣)
 
 ## Cómo ejecutarlo
@@ -47,6 +48,11 @@ Durante la partida:
 
 Cada carta que llega a una fundación suma 10 puntos. Al terminar, el puntaje se guarda en el ranking (mientras el programa siga abierto).
 
+**Cómo se gana y cómo se pierde**
+- **Se gana** al completar las cuatro fundaciones (de A a K en cada palo).
+- **Se pierde** cuando ya no queda ninguna jugada útil; el programa lo detecta solo y muestra "Sin jugadas posibles. ¡Perdiste!".
+- También se puede **abandonar** con la acción 7.
+
 ## Estructuras de datos usadas
 
 | Estructura | Dónde se usa |
@@ -67,6 +73,7 @@ El manual de usuario, el manual técnico, el diagrama de clases y las tablas de 
 
 ## Limitaciones
 
-- "Perder" equivale a abandonar la partida; no se detecta automáticamente que no haya jugadas.
+- La derrota se detecta con un criterio práctico (no queda ninguna jugada útil), no con una demostración de que la partida no tenga solución. Al perder no se puede deshacer.
+- Al reciclar el mazo se borra el historial, así que no se puede deshacer más allá de ese punto.
 - El ranking no se guarda en archivo.
 - El árbol no está balanceado (peor caso O(n)).
