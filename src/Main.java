@@ -38,18 +38,20 @@ void mostrarReglas() {
     System.out.println("Fundaciones: empiezan con el As y suben de uno en uno, del mismo palo.");
     System.out.println("Cada carta que llega a una fundación suma 10 puntos.");
     System.out.println("Puedes robar del mazo, y cuando se acaba, el descarte vuelve al mazo.");
+    System.out.println("Ganas al completar las 4 fundaciones. Pierdes si ya no queda ninguna jugada posible, o si abandonas.");
 }
 
 /**
  * Maneja una partida completa: reparte, repite el ciclo de jugadas hasta que
- * el jugador gane o abandone, y al final guarda el puntaje en el ranking.
- */
+ * el jugador gane, se quede sin jugadas posibles o abandone, y al final guarda
+ * el puntaje en el ranking.
+ * */
 void jugarPartida() {
     Solitario juego = new Solitario();
     juego.repartir();
     boolean abandonar = false;
 
-    while (!juego.haGanado() && !abandonar) {
+    while (!juego.haGanado() && !abandonar && juego.hayJugadas()) {
         System.out.println();
         juego.mostrar();
         System.out.println();
@@ -91,8 +93,10 @@ void jugarPartida() {
     juego.mostrar();
     if (juego.haGanado()) {
         System.out.println("¡GANASTE!");
-    } else {
+    } else if (abandonar) {
         System.out.println("Partida terminada");
+    } else {
+        System.out.println("Sin jugadas posibles. ¡Perdiste!");
     }
     System.out.println("Puntaje final: " + juego.getPuntaje());
     if (juego.getPuntaje() > 0) {

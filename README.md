@@ -7,6 +7,7 @@ Juego de Solitario Klondike para la consola, hecho en Java y construido solo con
 ## Autor
 
 - Brayan Estiven Chantre Sánchez
+- Medardo Esteeven Quiñonez Dorado
 - Docente: Ana María Caviedes Castillo
 
 ## Requisitos

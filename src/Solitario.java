@@ -443,6 +443,145 @@ public class Solitario {
     }
 
     /**
+     * Indica si una carta podría subir a su fundación: si la pila de su palo
+     * está vacía solo entra el As, y si no, la carta que vale uno más que el
+     * tope. Solo pregunta, no mueve nada. Complejidad O(1)
+     *
+     * @param carta carta que se quiere comprobar
+     * @return true si la carta puede subir a la fundación
+     */
+    private boolean cabeEnFundacion(Carta carta) {
+        Carta tope = fundaciones[carta.getPalo().ordinal()].verTope();
+        if (tope == null) {
+            return carta.getValor() == 1;
+        }
+        return carta.getValor() == tope.getValor() + 1;
+    }
+
+    /**
+     * Revisa si la última carta de alguna columna puede subir a una fundación.
+     * Complejidad O(1): mira 7 columnas como máximo.
+     *
+     * @return true si alguna columna tiene esa jugada
+     */
+    private boolean hayJugadaColumnaAFundacion() {
+        for (int c = 0; c < 7; c++) {
+            int n = columnas[c].tamano();
+            if (n > 0 && cabeEnFundacion(columnas[c].obtener(n - 1))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Indica si una carta podría ponerse al final de una columna: sobre una
+     * carta de color distinto y valor uno mayor, o si es un K y la columna
+     * está vacía. Solo pregunta, no mueve nada. Complejidad O(n) por obtener()
+     *
+     * @param carta carta que se quiere comprobar
+     * @param destino columna destino (0 a 6)
+     * @return true si la carta cabe en esa columna
+     */
+    private boolean cabeEnColumna(Carta carta, int destino) {
+        Carta base = columnas[destino].obtener(columnas[destino].tamano() - 1);
+        if (base == null) {
+            return carta.getValor() == 13;
+        }
+        return base.esRoja() != carta.esRoja() && base.getValor() == carta.getValor() + 1;
+    }
+
+    /**
+     * Indica si una carta del mazo o del descarte tiene algún lugar a donde
+     * ir: una fundación o el final de alguna columna.
+     *
+     * @param carta carta que se quiere comprobar
+     * @return true si puede ir a alguna parte
+     */
+    private boolean cartaTieneJugada(Carta carta) {
+        if (cabeEnFundacion(carta)) {
+            return true;
+        }
+        for (int destino = 0; destino < 7; destino++) {
+            if (cabeEnColumna(carta, destino)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Revisa todas las cartas del mazo y del descarte, sin cambiar su orden:
+     * saca cada carta, la comprueba y la vuelve a poner al final. Tras una
+     * vuelta completa todo queda como estaba. Complejidad O(n)
+     *
+     * @return true si alguna carta del mazo o del descarte puede jugarse
+     */
+    private boolean hayJugadaDesdeMazoODescarte() {
+        boolean hay = false;
+
+        int enMazo = mazo.tamano();
+        for (int i = 0; i < enMazo; i++) {
+            Carta carta = mazo.desencolar();
+            if (cartaTieneJugada(carta)) {
+                hay = true;
+            }
+            mazo.encolar(carta);
+        }
+
+        int enDescarte = descarte.tamano();
+        for (int i = 0; i < enDescarte; i++) {
+            Carta carta = descarte.eliminarInicio();
+            if (cartaTieneJugada(carta)) {
+                hay = true;
+            }
+            descarte.insertarFinal(carta);
+        }
+        return hay;
+    }
+
+    /**
+     * Revisa si hay un movimiento útil entre columnas: uno que descubra una
+     * carta tapada o deje libre una carta que pueda subir a la fundación.
+     * Los movimientos que solo cambian cartas de lugar no cuentan, porque
+     * se podrían repetir sin fin. Complejidad acotada: máximo 52 cartas.
+     *
+     * @return true si existe algún movimiento útil
+     */
+    private boolean hayJugadaColumnaAColumna() {
+        for (int origen = 0; origen < 7; origen++) {
+            int n = columnas[origen].tamano();
+            for (int pos = 1; pos < n; pos++) {
+                Carta debajo = columnas[origen].obtener(pos - 1);
+                boolean util = !debajo.isBocaArriba() || cabeEnFundacion(debajo);
+                if (!util) {
+                    continue;
+                }
+                for (int destino = 0; destino < 7; destino++) {
+                    if (puedeMover(origen, pos, destino)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Indica si al jugador todavía le queda alguna jugada útil: subir una
+     * carta de una columna a la fundación, mover entre columnas descubriendo
+     * o liberando una carta, o jugar alguna carta del mazo o del descarte.
+     * Si devuelve false la partida está perdida. No modifica el tablero.
+     *
+     * @return true si queda al menos una jugada
+     */
+    public boolean hayJugadas() {
+        return hayJugadaColumnaAFundacion()
+                || hayJugadaColumnaAColumna()
+                || hayJugadaDesdeMazoODescarte();
+    }
+
+    /**
      * Indica si el jugador ganó: las 4 fundaciones tiene las 13 cartas.
      * Complejidad 0(1), porque tamano() de la pila no recorre nada.
      *
